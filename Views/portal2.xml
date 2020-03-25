@@ -1,0 +1,1034 @@
+<UI layout='objectempty'>
+    <Section id='main'>
+    <ScriptSource src='#{resourceurl}/#{app}/jquery.gridster.min.js' />
+    <StyleSheet src='#{resourceurl}/#{app}/jquery.gridster.css?t=1' />
+    <StyleSheet src='#{resourceurl}/#{app}/uxp/uxp.css?t=#{now}' />
+    <Service id='links' service='UseCaseManager.UseCaseLink:LinksForUser' />
+    <Service id='latest' service='UXP.UserData:LatestItems' serialize='true' />
+    <Service id='dashboard' service='UXP.UserData:DashboardData' serialize='true'>
+        <UserKey>#{auth.UserKey}</UserKey>
+    </Service>
+     <Service id='dbconfig' service='UXP.UserData:Dashboard' serialize='true'>
+        <UserKey>#{auth.UserKey}</UserKey>
+    </Service>
+    <ScriptSource src='#{resourceurl}/#{app}/uxp/uxp.js?t=v1' />
+    <ScriptSource src='#{resourceurl}/#{app}/uxp/notifications/dist/notifications.js?t=#{now}' />
+    <Field type='hidden' id='accountType' value='#{if account.settings.IsLandlord? then [landlord] else [tenant]}' />
+    <Field type='hidden' id='model' value='#{if account.settings.IsLandlord? then [Landlord] else [UXP]}' />
+    <Service id='notifications' service='LucyMobile.GetLatestNotifications' serialize='true'>
+        <max>10</max>
+    </Service>
+    <Script>
+    <![CDATA[
+    $(()=>{
+         $('html').addClass('uxp-html');
+        var accountType = $SDV('accountType');
+        var model = $SDV('model');
+        UXPNotifications.setupNotifications(model,__token__,__ServiceData__.notifications,accountType);
+    });
+   
+    ]]>
+    </Script>
+        <Field type='html'>
+        <![CDATA[
+        <div class='uxp-body'>
+            <div class='uxp-header'>
+                <div class='logo'></div>
+                <div class='title'>ADANI EXPERIENCE</div>
+                <div class='msg1'></div>
+                <div class='tray'>
+                <a href='#{appurl}/Marketplace/home' class='marketplace #{if authrole.Marketplace.canopenapp? then [] else [invisible]}'></a>
+                    <span class='inbox' onclick='UXPNotifications.showNotifications();return false;'></span>
+                    <span class='#{if !auth.LoginID? then [invisible]} userlabel subtxt' title='#{auth.FullName}'>
+                            <a href='#' onclick='ServiceDesk.showPopupMenu(this,"_userprofilemenu_");return false;' 
+                            style='float:left;margin-top:7px;#{profileimagetbstyle}' 
+                            class='icon-tb-profile'
+                            ></a>
+                            
+                        </span>
+                    <span class='welcomemsg'>#{:sys.header-welcome} #{html(auth.FirstName)}</span>
+                    <span class='menu' onclick='showMenu();return false;'></span>
+                </div>
+            </div>
+
+             <div class='uxp-sidebar'>
+                <div class='links'>
+                    ${for link in services.links}
+                        <div class='item'>
+                            <div class='icon' style='background-image: url(#{link.IconUrl});'></div>
+                            <a class='text' ${if link.Url?}href='#{link.Url}'${end} ${if link.App?}href='#{appurl}/#{link.App}/#{link.View}'${else}href='#{appurl}/System/sandbox-#{link.View}'${end}
+                            ${if link.LinkType==[dialog]}
+                            onclick='loadUXPDialog(this);return false;'
+                            app='#{link.App}'
+                            view='#{link.View}'
+                            ${end}
+                            >#{link.Title}</a>
+                        </div>
+                    ${end} 
+
+                </div>
+
+                <div class="uxp-sidebar_logo"></div>
+
+                <div class="sidebar_list">
+                    <ul>
+                        <li>
+                            <span class="sidebar_list_icon building_icon"></span><a href="#">BUILDING MANAGEMENT</a>
+                        </li>
+                         <li>
+                            <span class="sidebar_list_icon energy_icon"></span><a href="#">ENERGY</a>
+                        </li>
+                         <li class="sidebar_list_active">
+                            <span class="sidebar_list_icon employee_icon"></span><a href="#">EMPLOYEE DASHBOARD</a>
+                        </li>
+                         <li>
+                            <span class="sidebar_list_icon operations_icon"></span><a href="#">OPERATIONS</a>
+                        </li>
+                    </ul> 
+                </div>
+
+
+            </div>
+
+            <div class='uxp-content'>
+                <div class='empty-dashboard- invisible'>
+                Welcome to the Experience Portal.
+                <br>This is your one-stop place to interact with your workplace
+                <br>Go to the marketplace to find stuff
+                <br>Click the <span class='menu-icon'></span> to add cards to this dashboard
+                </div>
+                <div class='gridster'>
+                   
+                    <div class='uxp-dashboard-container '>
+
+
+                           <div data-row='1' data-col='1' data-sizex='1' data-sizey='1' class='uxp-widget actionicon'>
+                                <div class='icon'  style='background-image:url(https://static.iviva.com/images/Adani_UXP/calendar_min_icon.png);'></div>
+                                <div class='title'>Book a Facility</div>
+                            </div>
+
+                             <div data-row='1' data-col='2' data-sizex='1' data-sizey='1' class='uxp-widget actionicon'>
+                                <div class='icon'  style='background-image:url(https://static.iviva.com/images/Adani_UXP/AC_min.png);'></div>
+                                <div class='title'>Request AC Extension</div>
+                            </div>
+
+                             <div data-row='1' data-col='3' data-sizex='1' data-sizey='1' class='uxp-widget actionicon'>
+                                <div class='icon'  style='background-image:url(https://static.iviva.com/images/Adani_UXP/pending_requests_icon_min.png);'></div>
+                                <div class='title'>Pending Requests</div>
+                            </div>
+
+                            <div data-row='1' data-col='4' data-sizex='1' data-sizey='1' class='uxp-widget actionicon'>
+                                <div class='icon'  style='background-image:url(https://static.iviva.com/images/Adani_UXP/rejected_requests_icon_min.png);'></div>
+                                <div class='title'>Rejected Requests</div>
+                            </div>
+
+                            <div data-row='1' data-col='5' data-sizex='1' data-sizey='1' class='uxp-widget actionicon'>
+                                <div class='icon'  style='background-image:url(https://static.iviva.com/images/Adani_UXP/desk_book_icon_min.png);'></div>
+                                <div class='title'>Book A Desk</div>
+                            </div>
+
+                            <div data-row='1' data-col='6' data-sizex='1' data-sizey='1' class='uxp-widget actionicon'>
+                                <div class='icon'  style='background-image:url(https://static.iviva.com/images/Adani_UXP/register_visitor_icon_min.png);'></div>
+                                <div class='title'>Register Visitor</div>
+                            </div>
+
+                            <div data-row='1' data-col='7' data-sizex='1' data-sizey='1' class='uxp-widget actionicon'>
+                                <div class='icon'  style='background-image:url(https://static.iviva.com/images/Adani_UXP/QR_badge_icon_min.png);'></div>
+                                <div class='title'>My QR Badge</div>
+                            </div>
+
+                            <div data-row='1' data-col='8' data-sizex='1' data-sizey='1' class='uxp-widget actionicon'>
+                                <div class='icon'  style='background-image:url(https://static.iviva.com/images/Adani_UXP/report_emergency_icon_min.png);'></div>
+                                <div class='title'>Report Emergency</div>
+                            </div>
+                            
+
+                        <div data-row='2' data-col='1' data-sizex='2' data-sizey='2' class='uxp-widget default visitor-card greybgdefault'>
+                            <style>
+                            .visitor-card {padding: 24px;}
+                            .visitor-card .st1 {color: #FA5B5BD8;margin-bottom: 10px;}
+                            .visitor-card .st2 {color: #FA5B5BD8; margin-bottom: 15px; font-size: 1.7em; margin-top: 5px; display: inline-block;}
+                            .visitor-card .st3 {font-size:0.9em;}
+                            .visitor-card .self { font-size: 1.1em; margin: 1em 0 1em 0; color: #424242D8; position: relative;}
+                            .visitor-card .self span{ font-size: 1.5em;}
+                            .visitor-card .self em{ background: url(https://static.iviva.com/images/Adani_UXP/calendar_min_icon.png) no-repeat 0 0; display: inline-block; width: 1.5em; height: 1.5em; background-size: contain; position: absolute; right: 0; top: 0;}
+                            .visitor-card .st4 {display:flex;flex-direction:row;justify-content:space-around;align-items:center;font-size:14px;text-transform:uppercase;color:#424242;position:absolute;bottom:4em;left:0px;right:0px;height:20px;padding:10px;box-sizing:border-box;}
+                            .visitor-card .st4 span {cursor: pointer; flex-grow: 0; display: inline-block; font-size: 12px;  font-weight: bold; color: #666; background: #e4e4e4; border-radius: 14px;  padding: 10px 15px; vertical-align: text-bottom;}
+                            </style>
+                            <div class='self'>Hello, <span>#{auth.FirstName}</span> <em class="calen"></em></div>
+                            <div class='st1'>
+                                Your visitor is here
+                            </div>
+                            <div class='st2'>
+                                Kishore Kumar
+                            </div>
+                            <div class='st3'>
+                                for the 10:00 am meeting
+                            </div>
+                            <div class='st4'>
+                                <span>Acknowldge</span>
+                                <span>Snooze</span>
+                            </div>
+                        </div>
+  
+
+
+                        <div data-row='2' data-col='2' data-sizex='6'  data-sizey='2' class='uxp-widget default greybgdefault'>
+
+                            <div class="visitors_count">
+                                <div class="visitors_count-top">
+                                    <div class="visitors_count-no">29 <span class="visitors_icon"></span></div>
+                                    <p>Daily visitor Count</p>
+                                </div>
+
+                                <div class="visitors_count-bot">
+
+
+                                <div class="visitors_plan">
+                                    <input class="radio" id="one" name="group" type="radio"  checked="checked">
+                                    <input class="radio" id="two" name="group" type="radio">
+                                    <input class="radio" id="three" name="group" type="radio">
+                                    <input class="radio" id="four" name="group" type="radio">
+
+                                    <div class="tabs">
+                                        <label class="tab_lable" id="one-tab" for="one">Year</label>
+                                        <label class="tab_lable" id="two-tab" for="two">Month</label>
+                                        <label class="tab_lable" id="three-tab" for="three">Week</label>
+                                        <label class="tab_lable" id="four-tab" for="four">Day</label>
+                                    </div>
+
+                                    <div class="panels">
+                                        <div class="panel" id="one-panel">
+                                        1
+                                        </div>
+                                        <div class="panel" id="two-panel">
+                                        2
+                                        </div>
+                                        <div class="panel" id="three-panel">
+                                        3
+                                        </div>
+                                        <div class="panel" id="four-panel">
+                                        4
+                                        </div>
+                                    </div>
+                                  </div> 
+
+                                  
+                            </div>
+
+                        </div>
+
+            <div class="visitors_chart"> 
+
+                <div class="visitors_chart_task">
+                    <ul>
+                        <li>
+                            <p>In Session</p>
+                            <h4>10</h4>
+                        </li>
+                        <li>
+                            <p>Concluded</p>
+                            <h4>23</h4>
+                        </li>
+                        <li>
+                            <p>Pending</p>
+                            <h4>03</h4>
+                        </li>
+                        <li>
+                            <p>Cancelled</p>
+                            <h4>00</h4>
+                        </li>
+                    </ul>
+               </div> 
+
+               <div class="visitor_chart_details">
+                    <ul>
+                        <li>
+                            <p>Avg. visits per month</p>
+                            <h5>40 - 50</h5>
+                        </li>
+                        <li>
+                            <p>Visits cancelled</p>
+                            <h5>15%</h5>
+                        </li>
+                        <li>
+                            <p>Peak hours</p>
+                            <h5>11 am - 3 pm</h5>
+                        </li> 
+                    </ul> 
+               </div>
+
+                 <div class="prev_next">
+                        <ul>
+                            <li>
+                            <a href="#">Prev</a>
+                            </li>
+                            <li>
+                                <a href="#">Next</a>
+                            </li> 
+                        </ul>
+                </div> 
+            
+                    <div id='chart1'></div>
+            
+            </div>
+                           
+
+
+
+                                <script>
+                                setTimeout(function(){
+
+                                $$('chart1').highcharts({
+
+                                    chart: {
+                                        type: 'areaspline'
+                                    },
+                                    title: {
+                                        text: 'Average Weekly Consumption'
+                                    },
+                                    /*
+                                    legend: {
+                                        layout: 'vertical',
+                                        align: 'left',
+                                        verticalAlign: 'top',
+                                        x: 150,
+                                        y: 100,
+                                        floating: true,
+                                        borderWidth: 1,
+                                        backgroundColor:
+                                        '#FFFFFF'
+                                    },*/
+                                    xAxis: {
+                                        categories: [
+                                        'Monday',
+                                        'Tuesday',
+                                        'Wednesday',
+                                        'Thursday',
+                                        'Friday',
+                                        'Saturday',
+                                        'Sunday'
+                                        ],
+                                        plotBands: [{ // visualize the weekend
+                                        from: 4.5,
+                                        to: 6.5,
+                                        color: 'rgba(68, 170, 213, .2)'
+                                        }]
+                                    },
+                                    yAxis: {
+                                        title: {
+                                        text: ''
+                                        }
+                                    },
+                                    tooltip: {
+                                        shared: true,
+                                        valueSuffix: ' units'
+                                    },
+                                    credits: {
+                                        enabled: false
+                                    },
+                                    plotOptions: {
+                                        areaspline: {
+                                        fillOpacity: 0.5
+                                        }
+                                    },
+                                    series: [{
+                                        name: 'Level 1',
+                                        data: [3, 4, 3, 5, 4, 10, 12]
+                                    }, {
+                                        name: 'Level 2',
+                                        data: [1, 3, 4, 3, 3, 5, 4]
+                                    }]
+                                    });
+
+                                },1000);
+
+                                </script>
+                        </div>
+
+
+                        <div data-row='3' data-col='1' data-sizex='3' data-sizey='2' class='uxp-widget default invite-carousel'>
+                            <div class='c'>
+                                <div class='item header'> 
+                                    <div class='title'>MEETING ROOM USAGE</div>  
+
+                                   <div class="visitors_plan">
+                                    <input class="radio" id="meeting_today" name="group" type="radio"  checked="checked">
+                                    <input class="radio" id="meeting_tomo" name="group" type="radio">
+                                    <input class="radio" id="meeting_dayaft" name="group" type="radio"> 
+
+                                    <div class="tabs">
+                                        <label class="tab_lable" id="meeting_today-tab" for="meeting_today">Today</label>
+                                        <label class="tab_lable" id="meeting_tomo-tab" for="meeting_tomo">Tue</label>
+                                        <label class="tab_lable" id="meeting_dayaft-tab" for="meeting_dayaft">Wed</label> 
+                                    </div>
+
+                                    <div class="panels">
+                                        <div class="panel" id="meeting_today-panel">
+                                        1
+                                        </div>
+                                        <div class="panel" id="meeting_tomo-panel">
+                                        2
+                                        </div>
+                                        <div class="panel" id="meeting_dayaft-panel">
+                                        3
+                                        </div> 
+                                    </div>
+                                  </div>
+
+                                  <div class="visitors_plan" style="width:26%; margin-left: 3%;">
+                                    <input class="radio" id="meeting_today" name="group" type="radio"  checked="checked">
+                                    <input class="radio" id="meeting_tomo" name="group" type="radio"> 
+
+                                    <div class="tabs">
+                                        <label class="tab_lable" id="meeting_today-tab" for="meeting_today">Data</label>
+                                        <label class="tab_lable" id="meeting_tomo-tab" for="meeting_tomo">view Trend</label> 
+                                    </div>                                    
+                                  </div>
+                                  
+                                </div>
+
+                                <div class="wing_angle" style="margin-top:0.5em;">
+                                    <select class="wings">
+                                        <option value="East_Wing">East Wing</option>
+                                        <option value="West_Wing">West Wing</option>
+                                        <option value="North_Wing">North Wing</option>
+                                        <option value="South_Wing">South Wing</option>
+                                    </select>
+                                </div>
+
+                                    <div class="meet_room_top">
+
+                                        <div class="room_usage_tab">
+                                           <div class="tab">
+                                                <button class="tablinks active" onclick="openTab(event, 'Duration')">Duration</button>
+                                                <button class="tablinks" onclick="openTab(event, 'Booking')">Booking</button>
+                                                <button class="tablinks" onclick="openTab(event, 'Rating')">Rating</button>
+                                                </div>
+
+                                                 <div class="prev_next">
+                                                    <ul>
+                                                        <li>
+                                                        <a href="#">Prev</a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="#">Next</a>
+                                                        </li> 
+                                                    </ul>
+                                            </div>
+
+
+
+                                                <div id="Duration" class="tabcontent" style="display: block;">
+                                                 <div class='dashboart_inner_widget'>
+
+                                                        <div class="inner_widget_box">
+                                                            <h5>Meeting room 1</h5>
+
+                                                            <ul class="inner_widget_box_list">
+                                                                <li>
+                                                                    <p>45 mins <span>Average duration </span></p>
+                                                                </li>
+                                                                <li>
+                                                                <p>15 <span>Cancelled</span></p> 
+                                                                </li>
+                                                                <li>
+                                                                <p>31 <span>Concluded early</span></p> 
+                                                                </li>
+                                                            </ul>
+                                                        </div> 
+
+                                                        <div class="inner_widget_box dark_grey_box">
+                                                            <h5>Meeting room 2</h5>
+
+                                                            <ul class="inner_widget_box_list">
+                                                                <li>
+                                                                    <p>22 mins <span>Average duration </span></p>
+                                                                </li>
+                                                                <li>
+                                                                <p>11 <span>Cancelled</span></p> 
+                                                                </li>
+                                                                <li>
+                                                                <p>27 <span>Concluded early</span></p> 
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+
+
+                                                        <div class="inner_widget_box light_grey_box">
+                                                            <h5>Meeting room 3</h5>
+
+                                                            <ul class="inner_widget_box_list">
+                                                                <li>
+                                                                    <p>36 mins <span>Average duration </span></p>
+                                                                </li>
+                                                                <li>
+                                                                <p>33 <span>Cancelled</span></p> 
+                                                                </li>
+                                                                <li>
+                                                                <p>54 <span>Concluded early</span></p> 
+                                                                </li>
+                                                            </ul>
+                                                        </div>  
+                                                    </div>
+                                                </div>
+
+                                                <div id="Booking" class="tabcontent">
+                                                2
+                                                </div>
+
+                                                <div id="Rating" class="tabcontent">
+                                                3
+                                                </div>
+                                        </div>
+
+                                        <script>
+                                            function openTab(evt, meetName) {
+                                            var i, tabcontent, tablinks;
+                                            tabcontent = document.getElementsByClassName("tabcontent");
+                                            for (i = 0; i < tabcontent.length; i++) {
+                                                tabcontent[i].style.display = "none";
+                                            }
+                                            tablinks = document.getElementsByClassName("tablinks");
+                                            for (i = 0; i < tablinks.length; i++) {
+                                                tablinks[i].className = tablinks[i].className.replace(" active", "");
+                                            }
+                                            document.getElementById(meetName).style.display = "block";
+                                            evt.currentTarget.className += " active";
+                                            }
+                                        </script>
+                                        
+                                    </div>
+
+
+                                
+                            </div>
+                        </div>
+
+
+
+ <div data-row='3' data-col='4' data-sizex='3' data-sizey='2' class='uxp-widget default invite-carousel'>
+                            <div class='c'>
+                                <div class='item header'> 
+                                    <div class='title' style="width: 80%;">MEETING room usage analytics</div>  
+
+                                   
+                               <div class="wing_angle" style="float: right; width: 20%;">
+                                    <select class="wings">
+                                        <option value="East_Wing">Daily Extension</option>
+                                        <option value="West_Wing">Daily Extension 1</option>
+                                        <option value="North_Wing">Daily Extension 2</option>
+                                        <option value="South_Wing">Daily Extension 3</option>
+                                    </select>
+                                </div>
+                                 
+                                </div>
+
+
+
+                                 <div class="visitor_chart_details meeting_usage_details">
+                                    <ul>
+                                        <li>
+                                            <p>SAVED MINUTES</p>
+                                            <h5>204</h5>
+                                        </li>
+                                        <li>
+                                            <p>VIOLATION MINUTES</p>
+                                            <h5>44</h5>
+                                        </li> 
+                                    </ul> 
+                            </div>
+
+
+
+                              <div class="wing_angle">
+                                    <select class="wings">
+                                        <option value="East_Wing">Meeting room 304</option>
+                                        <option value="West_Wing">Meeting room 305</option>
+                                        <option value="North_Wing">Meeting room 306</option>
+                                        <option value="South_Wing">Meeting room 307</option>
+                                    </select>
+                                </div>
+
+
+
+
+
+
+                                 <div class='dashboart_inner_widget'>
+
+                                    <div class="meet_room_analytics">
+                                         <div class="meet_room_analytics-lft">
+                                            <h6>20</h6>
+                                            <p>mins</p>
+                                         </div>
+                                          <div class="meet_room_analytics-rgt">
+                                            <p>304, fLOOR 5</p>
+                                            <em>No reservation</em>
+                                         </div>
+                                    </div>
+
+                                      <div class="meet_room_analytics">
+                                         <div class="meet_room_analytics-lft">
+                                            <h6>03</h6>
+                                            <p>mins</p>
+                                         </div>
+                                          <div class="meet_room_analytics-rgt">
+                                            <p>304, fLOOR 5</p>
+                                            <em>No reservation</em>
+                                         </div>
+                                    </div>
+
+                                      <div class="meet_room_analytics">
+                                         <div class="meet_room_analytics-lft">
+                                            <h6>04</h6>
+                                            <p>mins</p>
+                                         </div>
+                                          <div class="meet_room_analytics-rgt">
+                                            <p>304, fLOOR 5</p>
+                                            <em>No reservation</em>
+                                         </div>
+                                    </div>
+
+                                      <div class="meet_room_analytics meet_room_analytics_active">
+                                         <div class="meet_room_analytics-lft">
+                                            <h6>40</h6>
+                                            <p>mins</p>
+                                         </div>
+                                          <div class="meet_room_analytics-rgt">
+                                            <p>304, fLOOR 5</p>
+                                            <em>No reservation</em>
+                                         </div>
+                                    </div>
+
+                                      <div class="meet_room_analytics">
+                                         <div class="meet_room_analytics-lft">
+                                            <h6>13</h6>
+                                            <p>mins</p>
+                                         </div>
+                                          <div class="meet_room_analytics-rgt">
+                                            <p>304, fLOOR 5</p>
+                                            <em>No reservation</em>
+                                         </div>
+                                    </div>
+
+                                      <div class="meet_room_analytics">
+                                         <div class="meet_room_analytics-lft">
+                                            <h6>35</h6>
+                                            <p>mins</p>
+                                         </div>
+                                          <div class="meet_room_analytics-rgt">
+                                            <p>304, fLOOR 5</p>
+                                            <em>No reservation</em>
+                                         </div>
+                                    </div>
+                                     <div class="meet_room_analytics">
+                                         <div class="meet_room_analytics-lft">
+                                            <h6>08</h6>
+                                            <p>mins</p>
+                                         </div>
+                                          <div class="meet_room_analytics-rgt">
+                                            <p>304, fLOOR 5</p>
+                                            <em>No reservation</em>
+                                         </div>
+                                    </div>
+
+                                      <div class="meet_room_analytics">
+                                         <div class="meet_room_analytics-lft">
+                                            <h6>14</h6>
+                                            <p>mins</p>
+                                         </div>
+                                          <div class="meet_room_analytics-rgt">
+                                            <p>304, fLOOR 5</p>
+                                            <em>No reservation</em>
+                                         </div>
+                                    </div>
+
+                                      <div class="meet_room_analytics meet_room_analytics_active">
+                                         <div class="meet_room_analytics-lft">
+                                            <h6>14</h6>
+                                            <p>mins</p>
+                                         </div>
+                                          <div class="meet_room_analytics-rgt">
+                                            <p>304, fLOOR 5</p>
+                                            <em>No reservation</em>
+                                         </div>
+                                    </div>
+
+ 
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        
+                       
+
+ 
+
+                              <div data-row='4' data-col='2' data-sizex='8'  data-sizey='2' class='uxp-widget default greybgdefault'>
+
+                                    <div class="visitors_count">
+
+                                            <div class="wing_angle" style="margin-top: 1em;"> 
+                                                <select class="wings">
+                                                    <option value="East_Wing">East Wing</option>
+                                                    <option value="West_Wing">West Wing</option>
+                                                    <option value="North_Wing">North Wing</option>
+                                                    <option value="South_Wing">South Wing</option>
+                                                </select>
+                                            </div>
+
+                                        <div class="visitors_count-top">
+                                              
+
+
+                                            <div class="visitors_count-no">350 <span class="visitors_icon"></span></div>
+                                            <p>Daily CAMPUS FOOTFALL</p>
+                                        </div>  
+
+                                        <div class="visitors_count-bot" style="margin-top:2em;">
+                                        
+                                            <p>East wing, floor 4</p>
+                                            <em>Floor with high activity</em>
+
+                                        </div>
+                                    </div> 
+
+                                    <div class="floor_details">
+                                        <div class="floor_details-cont"> 
+                                   
+                                            <table>
+                                                <tr>
+                                                    <th>Time</th>
+                                                    <th>00 : 10 AM</th>
+                                                    <th>01 : 00 AM</th>
+                                                    <th>02 : 00 AM</th>
+                                                    <th>03 : 00 AM</th>
+                                                    <th>04 : 00 AM</th>
+                                                    <th>05 : 00 AM</th>
+                                                    <th>06 : 00 AM</th>
+                                                    <th>07 : 00 AM</th>
+                                                    <th>08 : 00 AM</th>
+                                                    <th>09 : 00 AM</th>
+                                                    <th>10 : 00 AM</th>
+                                                    <th>11 : 00 AM</th>
+                                                    <th>12 : 00 AM</th>
+                                                    <th>01 : 00 PM</th>
+                                                    <th>02 : 00 PM</th>
+                                                    <th>03 : 00 PM</th>
+                                                    <th>04 : 00 PM</th>
+                                                    <th>05 : 00 PM</th>
+                                                    <th>06 : 00 PM</th>
+                                                    <th>07 : 00 PM</th>
+                                                    <th>08 : 00 PM</th>
+                                                </tr>
+                                                <tr>
+                                                    <th><span class="floor_arrow floor_up_arrow"></span>FLOOR 7</th>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_white"></span> 55</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 55</div></td>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_grey"></span> 350</div></td>
+                                                    <td><div class="table_data grey-box_data">No Data</td>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_white"></span> 55</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 85</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 350</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 50</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 23</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 50</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 23</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 50</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 23</div></td> 
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 85</div></td> 
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_grey"></span> 350</div></td>
+                                                    <td><div class="table_data">No Data</div></td>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_white"></span> 55</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_white"></span> 85</div></td>
+                                                <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_grey"></span> 350</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_white"></span> 50</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 23</div></td> 
+                                                </tr>
+
+                                                <tr>
+                                                    <th><span class="floor_arrow floor_up_arrow"></span>FLOOR 6</th>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_white"></span> 55</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 55</div></td>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_grey"></span> 350</div></td>
+                                                    <td><div class="table_data grey-box_data">No Data</td>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_white"></span> 55</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 85</div></td>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_grey"></span> 350</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 50</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 23</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 50</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 23</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 50</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 23</div></td> 
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 85</div></td> 
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_grey"></span> 350</div></td>
+                                                    <td><div class="table_data">No Data</div></td>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_white"></span> 55</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_white"></span> 85</div></td>
+                                                <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_grey"></span> 350</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_white"></span> 50</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 23</div></td> 
+                                                </tr>
+
+                                                <tr>
+                                                    <th><span class="floor_arrow floor_up_arrow"></span>FLOOR 5</th>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_white"></span> 55</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 55</div></td>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_grey"></span> 350</div></td>
+                                                    <td><div class="table_data grey-box_data">No Data</td>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_white"></span> 55</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 85</div></td>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_grey"></span> 350</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 50</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 23</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 50</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 23</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 50</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 23</div></td> 
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 85</div></td> 
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_grey"></span> 350</div></td>
+                                                    <td><div class="table_data">No Data</div></td>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_white"></span> 55</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_white"></span> 85</div></td>
+                                                <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_grey"></span> 350</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_white"></span> 50</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 23</div></td> 
+                                                </tr>
+
+                                                <tr>
+                                                    <th><span class="floor_arrow floor_up_arrow"></span>FLOOR 4</th>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_white"></span> 55</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 55</div></td>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_grey"></span> 350</div></td>
+                                                    <td><div class="table_data grey-box_data">No Data</td>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_white"></span> 55</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 85</div></td>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_grey"></span> 350</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 50</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 23</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 50</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 23</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 50</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 23</div></td> 
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 85</div></td> 
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_grey"></span> 350</div></td>
+                                                    <td><div class="table_data">No Data</div></td>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_white"></span> 55</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_white"></span> 85</div></td>
+                                                <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_grey"></span> 350</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_white"></span> 50</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 23</div></td> 
+                                                </tr>
+
+                                                <tr>
+                                                    <th><span class="floor_arrow floor_up_arrow"></span>FLOOR 3</th>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_white"></span> 55</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 55</div></td>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_grey"></span> 350</div></td>
+                                                    <td><div class="table_data grey-box_data">No Data</td>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_white"></span> 55</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 85</div></td>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_grey"></span> 350</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 50</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 23</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 50</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 23</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 50</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 23</div></td> 
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 85</div></td> 
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_grey"></span> 350</div></td>
+                                                    <td><div class="table_data">No Data</div></td>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_white"></span> 55</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_white"></span> 85</div></td>
+                                                <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_grey"></span> 350</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_white"></span> 50</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 23</div></td> 
+                                                </tr>
+
+                                                <tr>
+                                                    <th><span class="floor_arrow floor_up_arrow"></span>FLOOR 2</th>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_white"></span> 55</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 55</div></td>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_grey"></span> 350</div></td>
+                                                    <td><div class="table_data grey-box_data">No Data</td>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_white"></span> 55</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 85</div></td>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_grey"></span> 350</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 50</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 23</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 50</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 23</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 50</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 23</div></td> 
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 85</div></td> 
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_grey"></span> 350</div></td>
+                                                    <td><div class="table_data">No Data</div></td>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_white"></span> 55</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_white"></span> 85</div></td>
+                                                <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_grey"></span> 350</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_white"></span> 50</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 23</div></td> 
+                                                </tr>
+
+                                                <tr>
+                                                    <th><span class="floor_arrow floor_up_arrow"></span>FLOOR 1</th>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_white"></span> 55</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 55</div></td>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_grey"></span> 350</div></td>
+                                                    <td><div class="table_data grey-box_data">No Data</td>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_white"></span> 55</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 85</div></td>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_grey"></span> 350</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 50</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 23</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 50</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 23</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 50</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 23</div></td> 
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 85</div></td> 
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_grey"></span> 350</div></td>
+                                                    <td><div class="table_data">No Data</div></td>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_white"></span> 55</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_white"></span> 85</div></td>
+                                                <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_grey"></span> 350</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_white"></span> 50</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 23</div></td> 
+                                                </tr>
+
+                                                <tr>
+                                                    <th><span class="floor_arrow floor_up_arrow"></span>FLOOR G</th>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_white"></span> 55</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 55</div></td>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_grey"></span> 350</div></td>
+                                                    <td><div class="table_data grey-box_data">No Data</td>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_white"></span> 55</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 85</div></td>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_grey"></span> 350</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 50</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 23</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 50</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 23</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 50</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 23</div></td> 
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 85</div></td> 
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_grey"></span> 350</div></td>
+                                                    <td><div class="table_data">No Data</div></td>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_white"></span> 55</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_white"></span> 85</div></td>
+                                                    <td><div class="table_data black-box_data"><span class="steps_mark steps_mark_grey"></span> 350</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_white"></span> 50</div></td>
+                                                    <td><div class="table_data"><span class="steps_mark steps_mark_grey"></span> 23</div></td> 
+                                                </tr>
+                                                
+                                            
+                                            </table>
+
+                                    </div>
+ 
+                                    
+                                    </div>
+
+                                </div>
+
+
+
+
+
+                        <div data-row='3' data-col='7' data-sizex='2' data-sizey='2' class='uxp-widget default invite-carousel'>
+                            <div class='c'>
+                                <div class='item header'> 
+                                    <div class='title' style="width: 80%;">Reservation frequency</div>   
+                                </div>
+
+                              <div class="wing_angle" style="float:none; text-align:center">
+                                 <p>Showing top 10</p>
+                                    <select class="wings">
+                                        <option value="East_Wing">Department</option>
+                                        <option value="West_Wing">Department 1</option>
+                                        <option value="North_Wing">Department 2</option>
+                                        <option value="South_Wing">Department 3</option>
+                                    </select>
+                                </div>
+
+                                <div class='dashboart_inner_widget'>
+
+                                     <div id='chart2'></div> 
+ 
+                                <script> 
+
+                                 setTimeout(function(){ 
+                                    $$('chart2').highcharts({ 
+                                        chart: {
+                                            type: 'pie',
+                                            options3d: {
+                                                enabled: true,
+                                                alpha: 45
+                                            }
+                                        }, 
+                                        title: {
+                                                text: ' '
+                                            },
+                                            plotOptions: {
+                                            pie: {
+                                                innerSize: 50,
+                                                depth: 45
+                                            }
+                                        },
+                                        series: [{
+                                        name: 'Delivered amount',
+                                        data: [
+                                        ['Admin', 3],
+                                        ['Sales', 5],
+                                        ['Operations', 3],
+                                        ['Finance', 3],
+                                        ['Marketing', 6],
+                                        ['Development', 8] 
+                                        ]
+                                    }]
+                                    });
+
+                                    },1000); 
+
+                                </script>
+
+                                    </div> 
+                                </div>
+                            </div>  
+                        </div> 
+                    </div>
+                </div>
+            </div>
+
+ 
+        </div>
+        <div class='blurry invisible'></div>
+          <div class='uxp-menu-options invisible'>
+                    <div class='closer' onclick='hideMenu();return false;'></div>
+                    <div class='title'>Menu</div>
+                    <div class='items'>
+                        <a href='#' onclick='hideMenu();browseCards();return false;'>Browse Cards</a>
+                        <a href='#{appurl}/UseCaseManager/usecases'>Switch to Configuration Dashboard</a>
+                        <a href='#{appurl}/User/userdashboard'>Switch to General Dashboard</a>
+                    </div>
+                </div>
+            </div>
+        <div class='card-browser invisible has-closer'>
+            <div class='closer' onclick='closeMe(this);return false;'></div>
+            <div class='title'>Add cards to your home page</div>
+            <div class='actions'>
+                <div class='adder hidden' onclick='addSelectedCards();return false;'></div>
+            </div>
+            <div class='loader'>Loading...</div>
+            <div class='card-list'></div>
+        </div>
+        <div class='new-cards-info has-closer invisible'>
+            <div class='closer' onclick='closeMe(this);return false;'></div>
+            <div class='text'>New cards are available</div>
+            <div class='view' onclick='browseCards();closeMe(this);return false;'>View</div>
+        </div>
+        ]]>
+        </Field>
+    </Section>
+</UI>

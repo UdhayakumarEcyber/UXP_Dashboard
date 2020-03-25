@@ -1,0 +1,21 @@
+<Object>
+	<LongName>User Experience Portal</LongName>
+	<ShortName>UXP</ShortName>
+	<Menus search="false" dashboard="true" metro="true"/>
+	<ViewMap>
+        <View name='userroles' mapto='System.userroles' />
+        <View name='dashboard' mapto='portal' />
+	</ViewMap>
+	<ViewOverrides>
+	</ViewOverrides>
+	<SideBars/>
+	<Popups/>
+	<Weblets>
+	</Weblets>
+	<ServiceSubscriptions>
+	</ServiceSubscriptions>
+	<LinkContainers>
+	</LinkContainers>
+	<OperatingModes>
+	</OperatingModes>
+</Object>

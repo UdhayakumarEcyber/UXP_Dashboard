@@ -1,0 +1,12 @@
+<UI layout='dialog'>
+    <Section id='title'>
+    <Field type='html'>Hello There</Field>
+    </Section>
+    <Section id='main'>
+        <FieldBlock>
+            <FieldList>
+                <Field type='text' title='Here we go' text='Whatever, man' />
+            </FieldList>
+        </FieldBlock>
+    </Section>
+</UI>

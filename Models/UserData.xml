@@ -1,0 +1,21 @@
+<Model name='UserData' table='UXPUserData' extends='User.User'>
+    <PrimaryAttribute id='UserKey' />
+    <Attribute id='Dashboard' type='data' />
+    <Attribute id='LastLink' type='int' />
+    <Attribute id='LastCard' type='int' />
+    <Query name='DashboardData' attributes='Dashboard,LastLink,LastCard'>
+        <Filter attribute='UserKey' optional='false' />
+    </Query>
+    <Query name='LatestItems'>
+    <Sql>
+    <![CDATA[
+    declare @ck int;
+    select @ck = max([Key]) from UseCaseCards;
+
+    declare @lk int;
+    select @lk = max([Key]) from UseCaseLinks;
+    select @ck as CardKey,@lk as LinkKey;
+    ]]>
+    </Sql>
+    </Query>
+</Model>

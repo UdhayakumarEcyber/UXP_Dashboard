@@ -1,0 +1,12 @@
+<Data >
+ <Table name="UXPUserData">
+  <Columns>
+    <Column name="UserKey" type="int" />
+    <Column name="Dashboard" type="varchar(max)" />
+    <Column name="LastLink" type="int" />
+    <Column name="LastCard" type="int" />
+  </Columns>
+  <Indexes />
+  <Triggers />
+</Table>
+</Data>

@@ -1,0 +1,15 @@
+<Roles>
+    <AppRoles>
+        <Role name='canopenapp'>Allowed to use app</Role>
+        <Role name='canview'>Allowed to view all assets</Role>
+    </AppRoles>
+    <UserRoles>
+		<UserRole name='Tenant Administrator' roles='canopenapp,canview' />
+		<UserRole name='Tenant User' roles='canopenapp,canview' />
+	</UserRoles>
+    <Default visible='#{authflag.canopenapp?}'>
+        <AuthFlag name='canopenapp' value='#{authrole.canopenapp?}' />
+		<AuthFlag name='canview' value='#{authrole.canview?}' />
+    </Default>
+    <View name='portal' visible='#{authrole.any?}' />
+</Roles>

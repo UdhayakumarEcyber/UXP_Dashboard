@@ -1,0 +1,120 @@
+<UI layout='objectempty'>
+    <Section id='main'>
+    <!-- <ScriptSource src='#{resourceurl}/#{app}/jquery.gridster.min.js' /> -->
+    <ScriptSource src='#{resourceurl}/#{app}/gridster.js' />
+
+    <StyleSheet src='#{resourceurl}/#{app}/jquery.gridster.css?t=1' />
+    <StyleSheet src='#{resourceurl}/#{app}/uxp/uxp.css?t=#{now}' />
+    <Service id='links' service='UseCaseManager.UseCaseLink:LinksForUser' />
+    <Service id='latest' service='UXP.UserData:LatestItems' serialize='true' />
+    <Service id='dashboard' service='UXP.UserData:DashboardData' serialize='true'>
+        <UserKey>#{auth.UserKey}</UserKey>
+    </Service>
+     <Service id='dbconfig' service='UXP.UserData:Dashboard' serialize='true'>
+        <UserKey>#{auth.UserKey}</UserKey>
+    </Service>
+    <ScriptSource src='#{resourceurl}/#{app}/uxp/uxp.js?t=v1' />
+    <ScriptSource src='#{resourceurl}/#{app}/uxp/notifications/dist/notifications.js?t=#{now}' />
+    <Field type='hidden' id='accountType' value='#{if account.settings.IsLandlord? then [landlord] else [tenant]}' />
+    <Field type='hidden' id='model' value='#{if account.settings.IsLandlord? then [Landlord] else [UXP]}' />
+    <Service id='notifications' service='LucyMobile.GetLatestNotifications' serialize='true'>
+        <max>10</max>
+    </Service>
+    <Script>
+    <![CDATA[
+    $(()=>{
+         $('html').addClass('uxp-html');
+        var accountType = $SDV('accountType');
+        var model = $SDV('model');
+        UXPNotifications.setupNotifications(model,__token__,__ServiceData__.notifications,accountType);
+    });
+   
+    ]]>
+    </Script>
+        <Field type='html'>
+        <![CDATA[
+        <div class='uxp-body'>
+            <div class='uxp-header'>
+                <div class='logo'></div>
+                <div class='title'>Experience Portal</div>
+                <div class='msg1'></div>
+                <div class='tray'>
+                <a href='#{appurl}/Marketplace/home' class='marketplace #{if authrole.Marketplace.canopenapp? then [] else [invisible]}'></a>
+                    <span class='inbox' onclick='UXPNotifications.showNotifications();return false;'></span>
+                    <span class='#{if !auth.LoginID? then [invisible]} userlabel subtxt' title='#{auth.FullName}'>
+                            <a href='#' onclick='ServiceDesk.showPopupMenu(this,"_userprofilemenu_");return false;' 
+                            style='float:left;margin-top:7px;#{profileimagetbstyle}' 
+                            class='icon-tb-profile'
+                            ></a>
+                            
+                        </span>
+                    <span class='welcomemsg'>#{:sys.header-welcome} #{html(auth.FirstName)}</span>
+                    <span class='menu' onclick='showMenu();return false;'></span>
+                </div>
+            </div>
+
+             <div class='uxp-sidebar'>
+                <div class='links'>
+                ${for link in services.links}
+                    <div class='item'>
+                        <div class='icon' style='background-image: url(#{link.IconUrl});'></div>
+                        <a class='text' ${if link.Url?}href='#{link.Url}'${end} ${if link.App?}href='#{appurl}/#{link.App}/#{link.View}'${else}href='#{appurl}/System/sandbox-#{link.View}'${end}
+                        ${if link.LinkType==[dialog]}
+                        onclick='loadUXPDialog(this);return false;'
+                        app='#{link.App}'
+                        view='#{link.View}'
+                        ${end}
+                          >#{link.Title}</a>
+                    </div>
+                ${end}
+                   
+
+                </div>
+            </div>
+
+            <div class='uxp-content'>
+                <div class='empty-dashboard- invisible'>
+                Welcome to the Experience Portal.
+                <br>This is your one-stop place to interact with your workplace
+                <br>Go to the marketplace to find stuff
+                <br>Click the <span class='menu-icon'></span> to add cards to this dashboard
+                </div>
+                <div class='gridster'>
+                   
+                    <div class='uxp-dashboard-container '>
+                    
+
+                    </div>
+                    </div>
+                </div>
+              
+        </div>
+        <div class='blurry invisible'></div>
+          <div class='uxp-menu-options invisible'>
+                    <div class='closer' onclick='hideMenu();return false;'></div>
+                    <div class='title'>Menu</div>
+                    <div class='items'>
+                        <a href='#' onclick='hideMenu();browseCards();return false;'>Browse Cards</a>
+                        <a href='#{appurl}/UseCaseManager/usecases'>Switch to Configuration Dashboard</a>
+                        <a href='#{appurl}/User/userdashboard'>Switch to General Dashboard</a>
+                    </div>
+                </div>
+            </div>
+        <div class='card-browser invisible has-closer'>
+            <div class='closer' onclick='closeMe(this);return false;'></div>
+            <div class='title'>Add cards to your home page</div>
+            <div class='actions'>
+                <div class='adder hidden' onclick='addSelectedCards();return false;'></div>
+            </div>
+            <div class='loader'>Loading...</div>
+            <div class='card-list'></div>
+        </div>
+        <div class='new-cards-info has-closer invisible'>
+            <div class='closer' onclick='closeMe(this);return false;'></div>
+            <div class='text'>New cards are available</div>
+            <div class='view' onclick='browseCards();closeMe(this);return false;'>View</div>
+        </div>
+        ]]>
+        </Field>
+    </Section>
+</UI>
